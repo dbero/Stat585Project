@@ -1,0 +1,19 @@
+Stat 585 Project: Danny Bero
+========================================================
+
+Topic: 
+- Has music recently become more homogenous? Analyzing famous songs using the R package tuneR.
+
+Questions of Interest:
+- Are hits from the past different than current hits?
+- Are hits from the past more variable than current hits? (Essentially, are songs becoming more homogenous?) 
+
+Data Availability:
+- The data for this project is just song files which are readily accessible in mp3 format. There are many ways to get these files and I already have some of the songs I am interested in analyzing (Stairway to Heaven - Led Zeppelin, Free Bird - Lynyrd Skynyrd). Getting other songs of interest shouldn't be much of a problem. 
+
+Analysis Ideas:
+- My plan is to summarize a few bilboard top hits from the past (60's - 70's) and a few current bilboard top hits using tuneR commands that find the min, max, mean, variance, periodicity, ect. We can then use this info to see if hits from the past were more variable than current hits, if they were different than current hits, etc. 
+
+
+
+
