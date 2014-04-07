@@ -83,3 +83,5 @@ newsongs = data.0010s[sample(1:nrow(data.0010s), 10, replace=F),]
 write.csv(oldies,file = "oldies.csv")
 write.csv(newsongs,file = "newsongs.csv")
 
+oldies = read.csv("oldies.csv")
+newsongs = read.csv("newsongs.csv")
