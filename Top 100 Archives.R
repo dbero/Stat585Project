@@ -37,7 +37,7 @@ getyear = function(year) {
 ## We can get all of the years using this command. Note: the for loop is actually faster than the ldply() statement 
 ## by 20.904 seconds. 
 
-data = NULL
+data.s = NULL
 years = c(1958:2014)
 
 # Use this command. 156.524 seconds (2:37)
@@ -45,9 +45,9 @@ for(i in 1:length(years)){
   y = getyear(years[i])
   y$Year = years[i]
   if(i == 1){
-      data = y
+      data.s = y
     } else{
-        data = rbind(data,y)
+        data.s = rbind(data,y)
       }
 }
 
@@ -85,3 +85,10 @@ write.csv(newsongs,file = "newsongs.csv")
 
 oldies = read.csv("oldies.csv")
 newsongs = read.csv("newsongs.csv")
+
+songdata = rbind(oldies,newsongs)
+
+write.csv(songdata, file = "songdata.csv")
+
+songdata = read.csv("songdata.csv")
+

@@ -34,10 +34,12 @@ equalWave(mercy.nosil, wal.nosil)
 # extractWave() cuts out a piece of the song. USEFULL!
 mercy.extract = extractWave(mercy.nosil, from = 15, to = 30, xunit = "time")
 
-# FF()
+# Periodogram
 
+stuff = periodogram(mono(Aquarius, "left"), width = 1024)
+hello = periodogram(mono(SaySomething, "left"), width = 1024)
 
-
+max(hello@spec[[3]])
 
 
 
@@ -50,13 +52,17 @@ songtoDF = function(song){
   right = x@right
   d.left = data.frame(mean.l = mean(left), sd.l = sd(left), median.l = median(left), min.l = min(left), 
                  max.l = max(left), range.l = max(left) - min(left))
-  d.right = data.frame(mean.r = mean(right), sd.r = sd(right), median.r = median(right), min.r = min(right), 
+  if(mean(right) == "NaN"){
+    d.right = data.frame(mean.r = mean(left), sd.r = sd(left), median.r = median(left), min.r = min(left),
+                         max.r = max(left), range.r = max(left) - min(left))
+  } else{
+    d.right = data.frame(mean.r = mean(right), sd.r = sd(right), median.r = median(right), min.r = min(right), 
                  max.r = max(right), range.r = max(right) - min(right))
+  }
   d = data.frame(d.left, d.right)
   return(d)
 }
 
-data = songtoDF(mercy)
 
 
 ######################################################################
@@ -64,7 +70,7 @@ data = songtoDF(mercy)
 
 Aquarius = readWave("aquarius.wav")
 BigGirls = readWave("biggirls.wav")
-BoomBoom = readWave("boom.wav")
+Boom = readWave("boom.wav")
 DontForget = readWave("dontforget.wav")
 DropIt = readWave("dropit.wav")
 Fame = readWave("fame.wav")
@@ -81,26 +87,35 @@ Georgia = readWave("georgia.wav")
 Umbrella = readWave("umbrella.wav")
 WeBelong = readWave("together.wav")
 Stronger = readWave("stronger.wav")
+WorkItOut = readWave("workitout.wav")
+
 
 ## Now apply the function
 
-Aquarius.dat = songtoDF(Aquarius)
-BigGirls.dat = readWave("biggirls.wav")
-BoomBoom.dat = readWave("boom.wav")
-DontForget.dat = readWave("dontforget.wav")
-DropIt.dat = readWave("dropit.wav")
-Fame.dat = readWave("fame.wav")
-HalfBreed.dat = readWave("halfbreed.wav")
-HeyJude.dat = readWave("jude.wav")
-IllBeThere.dat = readWave("bethere.wav")
-Drag.dat = readWave("drag.wav")
-LoveChild.dat = readWave("lovechild.wav")
-Jagger.dat = readWave("jagger.wav")
-NoOne.dat = readWave("noone.wav")
-ReachOut.dat = readWave("reachout.wav")
-SaySomething.dat = readWave("saysomething.wav")
-Georgia.dat = readWave("georgia.wav")
-Umbrella.dat = readWave("umbrella.wav")
-WeBelong.dat = readWave("together.wav")
-Stronger.dat = readWave("stronger.wav")
+songs = c(HalfBreed, Georgia, Aquarius, HeyJude, LoveChild, Drag, IllBeThere, WorkItOut,
+          Fame, ReachOut, Stronger, Jagger, NoOne, Umbrella, BigGirls, DontForget, Boom,
+          DropIt, SaySomething, WeBelong)
+
+names = c("HalfBreed", "Georgia", "Aquarius", "HeyJude", "LoveChild", "Drag", "IllBeThere", 
+          "WorkItOut", "Fame", "ReachOut", "Stronger", "Jagger", "NoOne", "Umbrella", 
+          "BigGirls", "DontForget", "Boom", "DropIt", "SaySomething", "WeBelong")
+
+songstoDF = function(songs, names){
+  data = NULL
+  for(i in 1:length(songs)){
+    d = songtoDF(songs[[i]])
+    if(i == 1){data = d} else {data = rbind(data, d)}
+  }
+  end = cbind(names,data)
+  return(end)
+}
+
+info = songstoDF(songs, names)
+
+data = cbind(songdata[,-1], info[,-1])
+
+write.csv(data, file = "data.csv")
+
+
+
 

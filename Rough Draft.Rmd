@@ -1,0 +1,148 @@
+STAT 585 Project: Are newer songs becoming more homogenous?
+========================================================
+
+Introduction
+========================
+
+It seems that everytime I hear the newest hit song on the radio, I am hearing a modified version of the last hit from a couple of weeks ago. The hit, of course, will begin with a verse, then a chorus, then another verse (which sounds strangely similar to the previous verse), and then another chorus. This will repeat until, if the artist is feeling bold, the song will have its "breakdown" and then end with a couple of chorus' in a row. It seems a blueprint has been made and every new pop artist follows it verbatim. This seems rather different from the chart-topping songs from the past, which seemed to follow no blueprint and represented many genres of music. This leads me to the main question of my analysis, are newer "hit" songs becoming more homogenous? And if so, can we prove it using statistics? In order to answer this question I will be randomly choosing ten songs from 1965 to 1975 and ten songs from 2004 to 2014 and checking if the differences between the songs have gotten smaller over time. First, we will take a look at the R package that will be used for the sound files, `tuneR`. Second, a function must be written to create a data table of summary statstics for the songs. Next, we will devise a reproducible plan to randomly select these 20 songs. Finally, we will conduct the necessary analysis to answer the question of interest. 
+
+
+Introduction to the tuneR Package
+======================
+
+Enter the tuneR package. Using tuneR, we can load in mp3 or wave files using commands such as `readMP3()` or `readWave()`. The song is converted into sort of a time series plot of frequency over time. We can see an example of how to read in data and what the data looks like in the plots below. Note that "jude.wav" is a 45 second clip of the song "Hey Jude" by the Beatles stored in a Wave file. 
+
+```{r}
+library(tuneR)
+HeyJude = readWave("jude.wav")
+plot(HeyJude)
+```
+
+HeyJude is now an S4 object and we can access and manipulate each channel using `HeyJude@left` or HeyJude@right. `HeyJude@right` is a numeric vector of amplitudes at each point in time and we can calculate summary statistics such as the mean or median using simple R commands like so.
+
+```{r}
+mean(HeyJude@right)
+```
+
+songtoDF Function
+=====================
+
+Using these summary statistics and the tuneR packages, we can create a function called `songtoDF()` that takes in a wave file and outputs a data frame. The summary statistics of interest are the mean, standard deviation, median, min, max, and range of both the left and right channels. Note that a song with only one channel stores that channel in @left. Therefore, in order to get data for the right channel we will set the @right equal to @left in this case. The additional function `songstoDF()` applies the function `songtoDF()` to a vector of wave files and a vector of song names. 
+
+```{r}
+songtoDF = function(song){
+  x = noSilence(song)
+  left = x@left
+  right = x@right
+  d.left = data.frame(mean.l = mean(left), sd.l = sd(left), median.l = median(left), min.l = min(left), 
+                 max.l = max(left), range.l = max(left) - min(left))
+  if(mean(right) == "NaN"){
+    d.right = data.frame(mean.r = mean(left), sd.r = sd(left), median.r = median(left), min.r = min(left),
+                         max.r = max(left), range.r = max(left) - min(left))
+  } else{
+    d.right = data.frame(mean.r = mean(right), sd.r = sd(right), median.r = median(right), min.r = min(right), 
+                 max.r = max(right), range.r = max(right) - min(right))
+  }
+  d = data.frame(d.left, d.right)
+  return(d)
+}
+
+
+songstoDF = function(songs, names){
+  data = NULL
+  for(i in 1:length(songs)){
+    d = songtoDF(songs[[i]])
+    if(i == 1){data = d} else {data = rbind(data, d)}
+  }
+  end = cbind(names,data)
+  return(end)
+}
+```
+
+
+Selecting the Songs
+==================
+
+Now that a function has been created to convert a list of songs to a data frame, we will have to devise a plan to pick the songs to be analyzed. This could be done in many ways, but the following is the solution I came up with. First, we will only consider the subset of hit songs that made number one on the Billboard Hot 100. We will also only use songs from 1965 to 1975, "oldies," and songs from 2004 to 2014, "new songs." The following function has been written to scrape all number one songs from a specific year off of the website www.billboard.com. 
+
+```{r}
+getyear = function(year) {
+  url = sprintf("http://www.billboard.com/archive/charts/%d/hot-100", year)
+  table = readHTMLTable(url)$`NULL`
+  
+  # rename the columns
+  names(table)[1] = "Week"
+  names(table)[2] = "Song"
+  names(table)[3] = "Artist"
+  
+  ## This function makes sure there is a song and artist for each week. Repeats were originally
+  ## left as <NA>
+  for(i in 1:nrow(table)){
+    if(is.na(table[i,]$Song)){
+      table[i,]$Song = table[i-1,]$Song
+    } else{
+      table[i,]$Song = table[i,]$Song
+    }
+    if(is.na(table[i,]$Artist)){
+      table[i,]$Artist = table[i-1,]$Artist
+    } else{
+      table[i,]$Artist = table[i,]$Artist
+    }
+  }
+  return(table)
+}
+```
+
+The function that is used to scrape all songs from 1958 to 2014 is left out because it takes quite a bit of time to run. Below is the function that randomly selected 10 songs from 1965 to 1975 and ten songs from 2004 to 2014. Note that it is not evaluated because the dataset with all of the songs in it is left out. 
+
+```{r eval=FALSE}
+data.6070s = data[which(data$Year %in% 1965:1975),]
+set.seed(123456)
+oldies = data.6070s[sample(1:nrow(data.6070s), 10, replace=F),]
+
+data.0010s = data[which(data$Year %in% 2004:2014),]
+set.seed(123456)
+newsongs = data.0010s[sample(1:nrow(data.0010s), 10, replace=F),]
+```
+
+We have songs! Below is the data table with the list of songs selected. 
+
+```{r}
+songdata = read.csv("songdata.csv")
+songdata[,-c(1:2)]
+```
+
+Analysis: Completing the Data Frame
+============================
+
+Now that we have the list of songs we will analyze, we can read the songs in and use `songstoDF()` to get a data frame. Note that the songs were clipped to 45 second chunks specificaly taken from 1:00 minutes to 1:45 minuutes in order to be uniform. This was done because the full length songs were too much for R to read in. Finally, we can column bind the data table from the previous part to the data table from `songstoDF()`. This will create a full data set that will be simple for analysis. 
+
+```{r eval=FALSE}
+songs = c(HalfBreed, Georgia, Aquarius, HeyJude, LoveChild, Drag, IllBeThere, WorkItOut,
+          Fame, ReachOut, Stronger, Jagger, NoOne, Umbrella, BigGirls, DontForget, Boom,
+          DropIt, SaySomething, WeBelong)
+
+names = c("HalfBreed", "Georgia", "Aquarius", "HeyJude", "LoveChild", "Drag", "IllBeThere", 
+          "WorkItOut", "Fame", "ReachOut", "Stronger", "Jagger", "NoOne", "Umbrella", 
+          "BigGirls", "DontForget", "Boom", "DropIt", "SaySomething", "WeBelong")
+
+info = songstoDF(songs, names)
+
+data = cbind(songdata[,-1], info[,-1])
+```
+
+```{r}
+data = read.csv("data.csv")
+data[,-c(1:2)]     
+```
+
+Analysis: Future Plans
+=============================
+
+Now that we have the data, a plan for further analysis will have to be devised. I am exploring the options of comparing two sets of data so see if one set (data from the 60's - 70's) is more variable and another data set (data from the 00's - 10's). 
+
+
+
+
+
+
