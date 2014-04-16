@@ -113,9 +113,21 @@ songstoDF = function(songs, names){
 info = songstoDF(songs, names)
 
 data = cbind(songdata[,-1], info[,-1])
+decade = c(rep("old",10), rep("new",10))
+data = cbind(data, decade)
+data = data[,-1]
 
 write.csv(data, file = "data.csv")
 
+data = read.csv("data.csv")[,-1]
 
+
+library(ggplot2)
+
+qplot(x = sd.r, y = mean.r, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+
+qplot(decade, mean.r, group = decade, geom = "boxplot", data = data)
+
+qplot(max.r, min.r, color = decade, data = data) + geom_smooth(aes(group = decade))
 
 

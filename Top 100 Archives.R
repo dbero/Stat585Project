@@ -47,9 +47,11 @@ for(i in 1:length(years)){
   if(i == 1){
       data.s = y
     } else{
-        data.s = rbind(data,y)
+        data.s = rbind(data.s,y)
       }
 }
+
+write.csv(data.s, file = "data.s.csv")
 
 # Don't use this one. 177.428 seconds (2:57)
 data = ldply(as.list(years), function(x) {
@@ -70,11 +72,11 @@ data = ldply(as.list(years), function(x) {
 ## over time. This could be interesting!
 
 
-data.6070s = data[which(data$Year %in% 1965:1975),]
+data.6070s = data.s[which(data$Year %in% 1965:1975),]
 set.seed(123456)
 oldies = data.6070s[sample(1:nrow(data.6070s), 10, replace=F),]
 
-data.0010s = data[which(data$Year %in% 2004:2014),]
+data.0010s = data.s[which(data$Year %in% 2004:2014),]
 set.seed(123456)
 newsongs = data.0010s[sample(1:nrow(data.0010s), 10, replace=F),]
 
