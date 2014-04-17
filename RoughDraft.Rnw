@@ -159,13 +159,22 @@ xtable(data[,c(3,6:11)])
 
 Above is an example of what the data table looks like. This is just the summary data for the left channel, the full dataset includes both left and right channels. 
 
-\section{Analysis: Are newer songs becoming more homogenous?}
+\section{Analysis: Teaser}
 
-
+When looking at some plots of the data, the evidence, however small, seems to point to the fact that songs \textit{are} becoming more homogenous. When looking at a plot of the standard deviation of the right channel versus the mean of the right channel, below, we can see new songs all have a mean \textit{very} close to zero, while oldies have means all over. It can also be noted that the standard deviation doesn't seem to have an effect on the mean. 
 
 <<libraries.3, echo=FALSE>>=
 library(ggplot2)
 @
 
+<<mean vs sd, message = F>>=
+qplot(x = sd.r, y = mean.r, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+@
+
+In addition to the previous plot, a plot of the min of the right channel versus the max of the right channel shows that new songs follow a linear trend. The min is some function of the max and visa versa. But, when looking at the oldies, there seems to be less of a linear trend and the data is a lot more variable. This adds to the evidence that newer songs follow some "recipe" while older songs were more variable. Note: The last two plots were for right channel only. The left channel looks very similar and therefore, was not included. 
+
+<<min vs max, message = F>>=
+qplot(max.r, min.r, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+@
 
 \end{document}

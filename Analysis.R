@@ -122,12 +122,32 @@ write.csv(data, file = "data.csv")
 data = read.csv("data.csv")[,-1]
 
 
+
+## Plots
+
 library(ggplot2)
 
 qplot(x = sd.r, y = mean.r, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+qplot(x = sd.l, y = mean.l, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
 
 qplot(decade, mean.r, group = decade, geom = "boxplot", data = data)
+qplot(decade, mean.l, group = decade, geom = "boxplot", data = data)
 
-qplot(max.r, min.r, color = decade, data = data) + geom_smooth(aes(group = decade))
+qplot(max.r, min.r, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+qplot(max.l, min.l, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+
+qplot(Year, mean.r, color = decade, data = data)
+qplot(Year, mean.l, color = decade, data = data)
+
+
+## Modeling
+range.lm = lm(range.r ~ decade, data = data)
+anova(range.lm)
+summary(range.lm)
+
+qqnorm(range.lm$res)
+qqline(range.lm$res)
+
+qplot(range.lm$fit, range.lm$res)
 
 
