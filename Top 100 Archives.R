@@ -47,8 +47,8 @@ for(i in 1:length(years)){
   if(i == 1){
       data.s = y
     } else{
-        data.s = rbind(data.s,y)
-      }
+      data.s = rbind(data.s,y)
+    }
 }
 
 write.csv(data.s, file = "data.s.csv")
@@ -72,25 +72,29 @@ data = ldply(as.list(years), function(x) {
 ## over time. This could be interesting!
 
 
-data.6070s = data.s[which(data$Year %in% 1965:1975),]
+data.6070s = data.s[which(data.s$Year %in% 1965:1975),]
 set.seed(123456)
 oldies = data.6070s[sample(1:nrow(data.6070s), 10, replace=F),]
 
-data.0010s = data.s[which(data$Year %in% 2004:2014),]
+data.0010s = data.s[which(data.s$Year %in% 2004:2014),]
 set.seed(123456)
 newsongs = data.0010s[sample(1:nrow(data.0010s), 10, replace=F),]
+# Note: The sample of old songs will remain the same, but the new songs will be different
+# because I first ran this sample a coupld of weeks ago and a few songs have been added to 
+# the 2014 list of hot 100 songs. 
 
 
 ## Lets save those data frames so we don't have to do this again
-write.csv(oldies,file = "oldies.csv")
-write.csv(newsongs,file = "newsongs.csv")
 
-oldies = read.csv("oldies.csv")
-newsongs = read.csv("newsongs.csv")
+#write.csv(oldies,file = "oldies.csv")
+#write.csv(newsongs,file = "newsongs.csv")
 
-songdata = rbind(oldies,newsongs)
+#oldies = read.csv("oldies.csv")
+#newsongs = read.csv("newsongs.csv")
 
-write.csv(songdata, file = "songdata.csv")
+#songdata = rbind(oldies,newsongs)
+
+#write.csv(songdata, file = "songdata.csv")
 
 songdata = read.csv("songdata.csv")
 

@@ -11,11 +11,11 @@
 
 \section*{Introduction}
 
-It seems that everytime I hear the newest hit song on the radio, I am hearing a modified version of the last hit from a couple of weeks ago. The hit, of course, will begin with a verse, then a chorus, then another verse (which sounds strangely similar to the previous verse), and then another chorus. This will repeat until, if the artist is feeling bold, the song will have its "breakdown" and then end with a couple of chorus' in a row. It seems a blueprint has been made and every new pop artist follows it verbatim. This seems rather different from the chart-topping songs from the past, which seemed to follow no blueprint and represented many genres of music. This leads me to the main question of my analysis, are newer "hit" songs becoming more homogenous? And if so, can we prove it using statistics? In order to answer this question I will be randomly choosing ten songs from 1965 to 1975 and ten songs from 2004 to 2014 and checking if the differences between the songs have gotten smaller over time. First, we will take a look at the R package that will be used for the sound files, tuneR. Next, we will devise a reproducible plan to randomly select these 20 songs. After that, a function must be written to create a data table of summary statstics for the songs. Finally, we will conduct the necessary analysis to answer the question of interest. 
+It seems that everytime I hear the newest hit song on the radio, I am hearing a modified version of the last hit from a couple of weeks ago. The hit, of course, will begin with a verse, then a chorus, then another verse (which sounds strangely similar to the previous verse), and then another chorus. This will repeat until, if the artist is feeling bold, the song will have its ``breakdown" and then end with a couple of chorus' in a row. It seems a blueprint has been made and every new pop artist follows it verbatim. This seems rather different from the chart-topping songs from the past, which seemed to follow no blueprint and represented many genres of music. This leads to the main question of my analysis, are newer ``hit" songs becoming more homogenous? And if so, can we prove it using statistics? In order to answer this question I will be randomly choosing ten songs from 1965 to 1975 and ten songs from 2004 to 2014 and checking if the differences between the songs have gotten smaller over time. First, we will take a look at the R package that will be used for the sound files, \texttt{tuneR}. Next, we will devise a reproducible plan to randomly select these 20 songs. After that, a function must be written to create a data table of summary statstics for the songs. Finally, we will conduct the necessary analysis to answer the question of interest. 
 
 \section{Introduction to the tuneR Package}
 
-Enter the tuneR package. Using tuneR, we can load in mp3 or wave files using commands such as readMP3() or readWave(). The song is converted into sort of a time series plot of frequency over time. We can see an example of how to read in data and what the data looks like in the plots below. Note that "jude.wav" is a 45 second clip of the song "Hey Jude" by the Beatles stored in a Wave file. 
+Enter the \texttt{tuneR} package. Using \texttt{tuneR}, we can load in mp3 or wave files using commands such as \texttt{readMP3()} or \texttt{readWave()}. The song is converted into a time series plot of frequency over time. We can see an example of how to read in data and what the data looks like in the plots below. Note that ``jude.wav" is a 45 second clip of the song ``Hey Jude" by the Beatles stored in a Wave file. 
 
 <<libraries.1, echo = FALSE>>=
 library(xtable)
@@ -27,10 +27,10 @@ library(tuneR)
 
 <<tuneRplot, fig.width=4, fig.height=4, out.width='\\textwidth'>>=
 HeyJude = readWave("jude.wav")
-plot(HeyJude, lwd = 1/2, cex.lab = 0.1)
+plot(HeyJude, lwd = 0.5, cex.lab = 0.1)
 @
 
-HeyJude is now an S4 object and we can access and manipulate each channel using HeyJude@left or HeyJude@right. HeyJude@right is a numeric vector of amplitudes at each point in time and we can calculate summary statistics such as the mean or median using simple R commands like so.
+\texttt{HeyJude} is now an S4 object and we can access and manipulate each channel using \texttt{HeyJude@left} or \texttt{HeyJude@right}. \texttt{HeyJude@right} is a numeric vector of amplitudes at each point in time and we can calculate summary statistics such as the mean or median using simple R commands like so.
 
 <<tuneRmean, fig.width=4, fig.height=3, out.width='\\textwidth'>>=
 mean(HeyJude@right)
@@ -38,7 +38,7 @@ mean(HeyJude@right)
 
 \section{songtoDF() Function}
 
-Using these summary statistics and the tuneR packages, we can create a function called `songtoDF()` that takes in a wave file and outputs a data frame. The summary statistics of interest are the mean, standard deviation, median, min, max, and range of both the left and right channels. Note that a song with only one channel stores that channel in @left. Therefore, in order to get data for the right channel we will set the @right equal to @left in this case. The additional function `songstoDF()` applies the function `songtoDF()` to a vector of wave files and a vector of song names. 
+Using these summary statistics and the \texttt{tuneR} package, we can create a function called \texttt{songtoDF()} that takes in a wave file and outputs a data frame. The summary statistics of interest are the mean, standard deviation, median, min, max, and range of both the left and right channels. The additional function, \texttt{songstoDF()}, applies the function \texttt{songtoDF()} to a vector of wave files and a vector of song names. 
 
 <<songtoDF>>=
 songtoDF = function(song){
@@ -72,7 +72,7 @@ songstoDF = function(songs, names){
 
 \section{Selecting the Songs}
 
-Now that a function has been created to convert a list of songs to a data frame, we will have to devise a plan to pick the songs to be analyzed. This could be done in many ways, but the following is the solution I came up with. First, we will only consider the subset of hit songs that made number one on the Billboard Hot 100. We will also only use songs from 1965 to 1975, "oldies," and songs from 2004 to 2014, "new songs." The following function has been written to scrape all number one songs from a specific year off of the website www.billboard.com. 
+Now that a function has been created to convert a list of songs to a data frame, we will have to devise a plan to pick the songs to be analyzed. This could be done in many ways, but the following is the solution that was implemented in my analysis. First, we will only consider the subset of hit songs that made number one on the Billboard Hot 100. We will also only use songs from 1965 to 1975, ``oldies," and songs from 2004 to 2014, ``new songs." The following function has been written to scrape all number one songs, by week, from a specific year off of the website www.billboard.com. 
 
 <<getyear>>=
 getyear = function(year) {
@@ -102,7 +102,7 @@ getyear = function(year) {
 }
 @
 
-The function that is used to scrape all songs from 1958 to 2014 is left out because it takes quite a bit of time to run. Below is the function that randomly selected 10 songs from 1965 to 1975 and ten songs from 2004 to 2014. Note that it is not evaluated because the dataset with all of the songs in it is left out. 
+We can use the above function to get the number one songs each week from 1958 to 2014. Below is the function that randomly selected 10 songs from 1965 to 1975 and ten songs from 2004 to 2014. Notice that this method will give songs that were on the charts longer a higher probability of being selected (i.e. each song does not have equal probaility of being sampled). This will not be a problem, in fact, this is exactly what we want because the analysis is interested in only the most popular songs of the past/present.
 
 <<data.s, echo = FALSE>>=
 data.s = read.csv("data.s.csv")
@@ -118,7 +118,7 @@ set.seed(123456)
 newsongs = data.0010s[sample(1:nrow(data.0010s), 10, replace=F),]
 @
 
-We have songs! Below is the data table with the list of songs selected. 
+We have songs! Below is the data table with the list of songs selected.
 
 <<songdata, echo=FALSE>>=
 songdata = read.csv("songdata.csv")
@@ -130,7 +130,7 @@ xtable(songdata[,-c(1:2)])
 
 \section{Completing the Data Frame}
 
-Now that we have the list of songs we will analyze, we can read the songs in and use `songstoDF()` to get a data frame. Note that the songs were clipped to 45 second chunks specificaly taken from 1:00 minutes to 1:45 minuutes in order to be uniform. This was done because the full length songs were too much for R to read in. Finally, we can column bind the data table from the previous part to the data table from `songstoDF()`. This will create a full data set that will be simple for analysis.
+Now that we have the list of songs we will analyze, we can read the songs in using \texttt{readWave()} and use \texttt{songstoDF()} to get a data frame. Note that the songs were clipped to 45 second chunks specificaly taken from 1:00 minutes to 1:45 minutes in order to be uniform. This was done because the full length songs were too much for R to read in. Finally, we can column bind the data table from the previous part to the data table from \texttt{songstoDF()}. This will create a full data set that will be simple for analysis.
 
 <<final.data, eval = FALSE>>=
 songs = c(HalfBreed, Georgia, Aquarius, HeyJude, LoveChild, Drag, IllBeThere, WorkItOut,
@@ -154,27 +154,36 @@ data = read.csv("data.csv")
 @
 
 <<data, echo = FALSE, results="asis">>=
-xtable(data[,c(3,6:11)])
+xtable(data[,c(3,12:17)])
 @
 
-Above is an example of what the data table looks like. This is just the summary data for the left channel, the full dataset includes both left and right channels. 
+Above is an example of what the data table looks like. This is just the summary data for the right channel, the full dataset includes both left and right channels in addition to the Week, Artist, and Year columns.  
 
 \section{Analysis: Teaser}
 
-When looking at some plots of the data, the evidence, however small, seems to point to the fact that songs \textit{are} becoming more homogenous. When looking at a plot of the standard deviation of the right channel versus the mean of the right channel, below, we can see new songs all have a mean \textit{very} close to zero, while oldies have means all over. It can also be noted that the standard deviation doesn't seem to have an effect on the mean. 
+When looking at some plots of the data, the evidence, however small, seems to point to the fact that songs \textit{are} becoming more homogenous. When looking at a plot of the standard deviation of the right channel versus the mean of the right channel, below, we can see new songs all have a mean \textit{very} close to zero, while oldies have means all over. It can also be noted that the standard deviation doesn't seem to have an effect on the mean.  
 
 <<libraries.3, echo=FALSE>>=
 library(ggplot2)
 @
 
 <<mean vs sd, message = F>>=
-qplot(x = sd.r, y = mean.r, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+qplot(x = sd.r, y = mean.r, color = decade, main = "Mean Frequency vs. Standard Deviation of Frequency", xlab = "Standard Deviation", ylab = "Mean", data = data) + geom_smooth(aes(group = decade), se = F)
 @
 
-In addition to the previous plot, a plot of the min of the right channel versus the max of the right channel shows that new songs follow a linear trend. The min is some function of the max and visa versa. But, when looking at the oldies, there seems to be less of a linear trend and the data is a lot more variable. This adds to the evidence that newer songs follow some "recipe" while older songs were more variable. Note: The last two plots were for right channel only. The left channel looks very similar and therefore, was not included. 
+The plot of year versus the mean of the right channel, below, provides us with another way to look at the previous plot. We can see the means of the newer songs are again clustered right around zero while the means of the oldies are a lot more spread out. 
+
+<<mean vs decade>>=
+qplot(Year, mean.r, color = decade, main = "Song Year vs. Mean Frequency", xlab = "Year", ylab = "Mean", data = data)
+@
+
+In addition to the previous plot, a plot of the min of the right channel versus the max of the right channel shows that new songs follow a linear trend; the min is some function of the max and visa versa. But, when looking at the oldies, there seems to be less of a linear trend and the data is a lot more variable. This adds to the evidence that newer songs follow some "recipe" while older songs were more variable. Note: These last three plots were for right channel only. The left channel looks very similar and therefore, was not included. 
 
 <<min vs max, message = F>>=
-qplot(max.r, min.r, color = decade, data = data) + geom_smooth(aes(group = decade), se = F)
+qplot(max.r, min.r, color = decade, main = "Min Frequency vs Max Frequency", xlab = "Max", ylab = "Min", data = data) + geom_smooth(aes(group = decade), se = F)
 @
+
+Though this ``evidence" may point towards the conclusion that newer songs are becoming more homogengenous, it does not prove anything. For example, the uniformity of the mean frequency of new songs could be due to better editing technologies or the use of similar editing techniques. We can't say for certain that songs are becoming more similar, but we can conclude that their frequencies are becoming more uniform. If someone would work on this data in the future, it would be interesting if a test could be developed to answer the question of interest more concretely. In addition, it may be interesting to look at editing technologies and the transformation of the editing process over time to see if that can explain the uniformity of the newer songs frequencies.  
+
 
 \end{document}

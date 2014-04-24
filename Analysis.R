@@ -117,7 +117,7 @@ decade = c(rep("old",10), rep("new",10))
 data = cbind(data, decade)
 data = data[,-1]
 
-write.csv(data, file = "data.csv")
+#write.csv(data, file = "data.csv")
 
 data = read.csv("data.csv")[,-1]
 
@@ -140,7 +140,7 @@ qplot(Year, mean.r, color = decade, data = data)
 qplot(Year, mean.l, color = decade, data = data)
 
 
-## Modeling
+## Modeling: I didn't use any of this in the report because the sample size was too small. 
 range.lm = lm(range.r ~ decade, data = data)
 anova(range.lm)
 summary(range.lm)
